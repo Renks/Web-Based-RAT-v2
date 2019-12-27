@@ -1,0 +1,27 @@
+Result:
+I have tested several ways to transfer Files/Images remotely using sockets.
+But each time file would get corrupted.
+
+Solution:
+I have found out the main cause of this issue,
+Which is not knowing the file's size before writing or reading it.
+
+Check out in tests package, there are two files Server and Client.
+Both of them have hardcoded data including the file's size.
+
+However they are perfect example of transferring files without corrupting them.
+Size is hard coded in 'buffer' variable which is of type byte[].
+
+We have to remotely send the size first before writing the file on either sides.
+For Instance:
+Say, File size is 36999 (36.1KB)
+And, File is an Image(jpg)
+
+Server sends the size first to client and client creates a buffer out of that size.
+Server ----> size ----> Client ----> buffer[size]
+
+Now server sends the image file to client and now client can write out the file in it's system.
+Server ----> image ----> Client ----> write(buffer, 0 ,buffer.length)
+
+buffer.length is equal to the size we sent.
+  
